@@ -1,0 +1,31 @@
+name: Update IP List
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 每小时第0分钟运行一次
+
+jobs:
+  update_ips:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 允许使用 GITHUB_TOKEN 提交更改:contentReference[oaicite:2]{index=2}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run IP scraper
+        run: |
+          python fetch_ips.py  # 执行爬虫脚本，生成 data/ips.txt
+
+      - name: Commit and push results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "更新IP地址列表"
